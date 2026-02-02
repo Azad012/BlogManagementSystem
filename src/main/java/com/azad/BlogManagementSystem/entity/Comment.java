@@ -1,32 +1,30 @@
 package com.azad.BlogManagementSystem.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
-public class Comment {
 
+public class Comment {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String comment;
+    @Column(nullable = false)
+    private String text;
 
-    private LocalDateTime createAt;
-
-    private LocalDateTime updatedAt;
-
-    private User user;
-
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User author;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 }

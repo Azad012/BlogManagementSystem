@@ -4,26 +4,39 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class User {
+public class User implements UserDetails {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
     private String username;
 
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<Post> posts = new ArrayList<>();
+    private String role; // e.g., "ROLE_USER" or "ROLE_ADMIN"
 
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private List<Post> posts;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(this.role));
+    }
 }
